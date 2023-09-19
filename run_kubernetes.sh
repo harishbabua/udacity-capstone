@@ -1,21 +1,20 @@
-#!/usr/bin/env bash
-
-# This tags and uploads an image to Docker Hub
-
-# Step 1:
-# This is your Docker ID/path
-# dockerpath=<>
-dockerpath=harishbabua/proj4api
-
+dockerpath=harishbabua/capstone
 # Step 2
 # Run the Docker Hub container with kubernetes
-kubectl create deployment kubernetes-udaproj4 --image=harishbabua/proj4api
+r=$(kubectl get pod capstone 2> /dev/null;echo $?)
 
+if [ "_$r" == "_1" ] ; then
+    kubectl run capstone \
+    --image=$dockerpath \
+    --image-pull-policy="Always" \
+    --overrides='{"apiVersion": "v1", "spec":{"imagePullSecrets": [{"name": "regcred"}]}}'
+fi
+
+ 
 # Step 3:
 # List kubernetes pods
-kubectl get deploy,rs,svc,pods
+kubectl get pods
 
 # Step 4:
 # Forward the container port to a host
-#kubectl port-forward <pod-name> <local-port>:<remote-port>
-kubectl port-forward pod/kubernetes-udaproj4-7c6696fb75-kp4d6 --address 0.0.0.0 8000:80
+kubectl port-forward capstone 8000:80
